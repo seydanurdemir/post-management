@@ -6,13 +6,15 @@ import com.youngadessi.demo.post.model.mapper.PostMapper;
 import com.youngadessi.demo.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -24,41 +26,80 @@ public class PostController {
 
     private static final PostMapper POST_MAPPER = Mappers.getMapper(PostMapper.class);
 
-    @GetMapping(value = "/getOK")
-    public HttpStatus getSamplePost() {
-        return HttpStatus.OK;
-    }
-
-    // TODO: 3/24/2022 Pageable ???
-
-    // TODO: 3/24/2022 ResponseEntity ???
-
     @GetMapping
-    public List<PostDTO> getAllPosts() {
-        List<Post> allPosts = postService.getAllPosts();
-        return allPosts.stream().map(POST_MAPPER::toDto).collect(Collectors.toList());
+    public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(value = 5) Pageable pageable) {
+        ResponseEntity<Page<Post>> response = null;
+
+        Page<Post> allPosts = postService.getAllPosts(pageable);
+
+        if (allPosts != null && !allPosts.isEmpty()) {
+            response = new ResponseEntity<Page<Post>>(allPosts, HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<Page<Post>>(HttpStatus.NOT_FOUND);
+            // throw new NotFoundException("Any post could not be found!");
+        }
+
+        return response;
     }
 
     @GetMapping(value = "/{id}")
-    public PostDTO getPost(@PathVariable @Min(1) Long id) {
-        return POST_MAPPER.toDto(postService.getPost(id));
+    public ResponseEntity<Post> getPost(@PathVariable(value = "id") @Min(1) Long id) {
+        ResponseEntity<Post> response = null;
+
+        Post post = postService.getPost(id);
+
+        if (post != null) {
+            response = new ResponseEntity<Post>(post, HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
+            // throw new NotFoundException("Post");
+        }
+
+        return response;
     }
 
     @PostMapping
-    public void savePost(@Valid @RequestBody PostDTO post) {
-        postService.addPost(POST_MAPPER.toEntity(post));
+    public ResponseEntity<Post> savePost(@Valid @RequestBody Post post) {
+        ResponseEntity<Post> response = null;
+
+        if (post != null) {
+            postService.savePost(post);
+            response = new ResponseEntity<Post>(post, HttpStatus.CREATED);
+        } else {
+            response = new ResponseEntity<Post>(HttpStatus.BAD_REQUEST);
+            // throw new NotValidDataException("Post"); ???
+        }
+
+        return response;
     }
 
     @PutMapping
-    public PostDTO updatePost(@Valid @RequestBody Post post) {
-        if (post.getId() == null) {
-            throw new RuntimeException("Post id can not be null for update!");
+    public ResponseEntity<Post> updatePost(@Valid @RequestBody Post post) {
+        ResponseEntity<Post> response = null;
+
+        if (post != null && postService.getPost(post.getId()) != null) {
+            postService.updatePost(post);
+            response = new ResponseEntity<Post>(post, HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
+            // throw new NotFoundException("Post");
         }
-        return POST_MAPPER.toDto(postService.updatePost(post));
+
+        return response;
     }
 
-    @DeleteMapping
-    public boolean deletePost(@RequestParam @Min(1) Long id) {
-        return postService.deletePost(id);
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable(value = "id") @Min(1) Long id) {
+        ResponseEntity<Void> response = null;
+
+        if (postService.getPost(id) != null) {
+            postService.deletePost(id);
+            response = new ResponseEntity<Void>(HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+            // throw new NotFoundException("Post");
+        }
+
+        return response;
     }
 }

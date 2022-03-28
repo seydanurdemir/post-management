@@ -4,6 +4,8 @@ import com.youngadessi.demo.post.model.entity.Post;
 import com.youngadessi.demo.post.repository.PostRepository;
 import com.youngadessi.demo.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +18,8 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
 
     @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
     @Override
@@ -27,23 +29,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void addPost(Post post) {
+    public Post savePost(Post post) {
         postRepository.save(post);
+        return post;
     }
 
     @Override
     public Post updatePost(Post post) {
-        Post post_=postRepository.findById(post.getId()).orElse(null);
+        Post post_ = postRepository.findById(post.getId()).orElse(null);
 
-        post_.setCreatedByName("werwerwe");
+        post_.setCreatedByName(post.getCreatedByName());
+        post_.setContent(post.getContent());
 
         return postRepository.save(post_);
     }
 
     @Override
-    public boolean deletePost(Long id) {
+    public void deletePost(Long id) {
         postRepository.delete(getPost(id));
-        return true;
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 public class GenericExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Map> handleNotfoundException(NotFoundException exception) {
+    public ResponseEntity<Map> handleNotFoundException(NotFoundException exception) {
         Map<String, String> response = new HashMap<>();
         response.put("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

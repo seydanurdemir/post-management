@@ -1,19 +1,21 @@
 package com.youngadessi.demo.post.service;
 
 import com.youngadessi.demo.post.model.entity.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PostService {
 
-    List<Post> getAllPosts();
+    Page<Post> getAllPosts(Pageable pageable);
 
     Post getPost(Long id);
 
-    void addPost(Post post);
+    Post savePost(Post post);
 
     Post updatePost(Post post);
 
-    boolean deletePost(Long id);
+    void deletePost(Long id);
 
 }
