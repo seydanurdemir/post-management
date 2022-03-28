@@ -28,61 +28,58 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(value = 5) Pageable pageable) {
-        ResponseEntity<Page<Post>> response = null;
+        ResponseEntity<Page<Post>> response;
 
         Page<Post> allPosts = postService.getAllPosts(pageable);
 
         if (allPosts != null && !allPosts.isEmpty()) {
-            response = new ResponseEntity<Page<Post>>(allPosts, HttpStatus.OK);
+            response = new ResponseEntity<>(allPosts, HttpStatus.OK);
         } else {
-            response = new ResponseEntity<Page<Post>>(HttpStatus.NOT_FOUND);
-            // throw new NotFoundException("Any post could not be found!");
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            // throw new NotFoundException("Posts");
         }
 
         return response;
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Post> getPost(@PathVariable(value = "id") @Min(1) Long id) {
-        ResponseEntity<Post> response = null;
+    public ResponseEntity<PostDTO> getPost(@PathVariable(value = "id") @Min(1) Long id) {
+        ResponseEntity<PostDTO> response;
 
         Post post = postService.getPost(id);
 
         if (post != null) {
-            response = new ResponseEntity<Post>(post, HttpStatus.OK);
+            response = new ResponseEntity<>(POST_MAPPER.toDto(post), HttpStatus.OK);
         } else {
-            response = new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
-            // throw new NotFoundException("Post");
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return response;
     }
 
     @PostMapping
-    public ResponseEntity<Post> savePost(@Valid @RequestBody Post post) {
-        ResponseEntity<Post> response = null;
+    public ResponseEntity<PostDTO> savePost(@Valid @RequestBody PostDTO postDTO) {
+        ResponseEntity<PostDTO> response;
 
-        if (post != null) {
-            postService.savePost(post);
-            response = new ResponseEntity<Post>(post, HttpStatus.CREATED);
+        if (postDTO != null) {
+            postService.savePost(POST_MAPPER.toEntity(postDTO));
+            response = new ResponseEntity<>(postDTO, HttpStatus.CREATED);
         } else {
-            response = new ResponseEntity<Post>(HttpStatus.BAD_REQUEST);
-            // throw new NotValidDataException("Post"); ???
+            response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return response;
     }
 
-    @PutMapping
-    public ResponseEntity<Post> updatePost(@Valid @RequestBody Post post) {
-        ResponseEntity<Post> response = null;
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<PostDTO> updatePost(@PathVariable(value = "id") @Min(1) Long id, @Valid @RequestBody PostDTO postDTO) {
+        ResponseEntity<PostDTO> response;
 
-        if (post != null && postService.getPost(post.getId()) != null) {
-            postService.updatePost(post);
-            response = new ResponseEntity<Post>(post, HttpStatus.OK);
+        if (id != null && postService.getPost(id) != null) {
+            postService.updatePost(id, POST_MAPPER.toEntity(postDTO));
+            response = new ResponseEntity<>(postDTO, HttpStatus.OK);
         } else {
-            response = new ResponseEntity<Post>(HttpStatus.NOT_FOUND);
-            // throw new NotFoundException("Post");
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return response;
@@ -90,14 +87,13 @@ public class PostController {
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable(value = "id") @Min(1) Long id) {
-        ResponseEntity<Void> response = null;
+        ResponseEntity<Void> response;
 
         if (postService.getPost(id) != null) {
             postService.deletePost(id);
-            response = new ResponseEntity<Void>(HttpStatus.OK);
+            response = new ResponseEntity<>(HttpStatus.OK);
         } else {
-            response = new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-            // throw new NotFoundException("Post");
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return response;

@@ -9,10 +9,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>common-services</artifactId>
+    <artifactId>services</artifactId>
 
-    <name>common-services</name>
-    <description>common-services</description>
+    <name>services</name>
+    <description>services</description>
 
     <packaging>pom</packaging>
 

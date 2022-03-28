@@ -4,8 +4,6 @@ import com.youngadessi.demo.post.model.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface PostService {
 
     Page<Post> getAllPosts(Pageable pageable);
@@ -14,7 +12,7 @@ public interface PostService {
 
     Post savePost(Post post);
 
-    Post updatePost(Post post);
+    Post updatePost(Long id, Post post);
 
     void deletePost(Long id);
 
