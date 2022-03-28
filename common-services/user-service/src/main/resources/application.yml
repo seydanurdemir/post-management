@@ -1,0 +1,11 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /user-service
+
+spring:
+  profiles:
+    include: sql #, script
+  jpa:
+    properties:
+      hibernate.default_schema: user_schema
