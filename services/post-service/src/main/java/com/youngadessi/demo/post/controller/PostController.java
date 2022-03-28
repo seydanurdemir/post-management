@@ -62,8 +62,7 @@ public class PostController {
         ResponseEntity<PostDTO> response;
 
         if (postDTO != null) {
-            postService.savePost(POST_MAPPER.toEntity(postDTO));
-            response = new ResponseEntity<>(postDTO, HttpStatus.CREATED);
+            response = new ResponseEntity<>(POST_MAPPER.toDto(postService.savePost(POST_MAPPER.toEntity(postDTO))), HttpStatus.CREATED);
         } else {
             response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -76,8 +75,7 @@ public class PostController {
         ResponseEntity<PostDTO> response;
 
         if (id != null && postService.getPost(id) != null) {
-            postService.updatePost(id, POST_MAPPER.toEntity(postDTO));
-            response = new ResponseEntity<>(postDTO, HttpStatus.OK);
+            response = new ResponseEntity<>(POST_MAPPER.toDto(postService.updatePost(id, POST_MAPPER.toEntity(postDTO))), HttpStatus.OK);
         } else {
             response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
