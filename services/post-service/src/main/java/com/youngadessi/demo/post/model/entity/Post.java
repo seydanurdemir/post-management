@@ -35,15 +35,15 @@ public class Post extends BaseEntity {
     @Column(name = "content")
     private String content;
 
-    @JsonManagedReference
     //@JsonIgnore
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> postComments;
 
     //@JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "tbl_post_tags",
+            name = "tbl_post_tag",
             joinColumns = @JoinColumn(name = "post_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id",referencedColumnName = "id")
     )

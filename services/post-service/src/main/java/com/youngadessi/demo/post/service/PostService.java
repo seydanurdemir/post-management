@@ -1,6 +1,5 @@
 package com.youngadessi.demo.post.service;
 
-import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

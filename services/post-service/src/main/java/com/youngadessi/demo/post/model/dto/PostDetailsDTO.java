@@ -2,14 +2,14 @@ package com.youngadessi.demo.post.model.dto;
 
 import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Tag;
-
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
-public class PostResponseDTO implements Serializable {
+public class PostDetailsDTO implements Serializable {
 
     private String createdByName;
 

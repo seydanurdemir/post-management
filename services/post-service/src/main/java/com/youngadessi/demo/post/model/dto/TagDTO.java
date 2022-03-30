@@ -1,6 +1,7 @@
 package com.youngadessi.demo.post.model.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.io.Serializable;
 
 @Getter
