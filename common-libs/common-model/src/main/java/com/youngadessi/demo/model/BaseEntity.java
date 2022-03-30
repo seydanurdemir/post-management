@@ -4,7 +4,6 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -14,7 +13,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @NoArgsConstructor
 @Getter
 @Setter
-//@Builder
 public class BaseEntity {
 
     @Id
@@ -35,7 +33,7 @@ public class BaseEntity {
     private Long updatedBy;
 
     @UpdateTimestamp
-    @Column(name = " updated_date_time")
+    @Column(name = "updated_date_time")
     private LocalDateTime updatedDateTime;
 
     @Version

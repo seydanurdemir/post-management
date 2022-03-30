@@ -1,6 +1,8 @@
 package com.youngadessi.demo.post.service.impl;
 
+import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Post;
+import com.youngadessi.demo.post.repository.CommentRepository;
 import com.youngadessi.demo.post.repository.PostRepository;
 import com.youngadessi.demo.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import java.util.Optional;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public Page<Post> getAllPosts(Pageable pageable) {
