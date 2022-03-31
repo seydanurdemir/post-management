@@ -63,7 +63,7 @@ public class TagController {
     public ResponseEntity<TagDTO> updateTag(@PathVariable(value = "id") @Min(1) Long id, @Valid @RequestBody TagDTO tagDTO) {
         if (id != null && tagService.getTag(id) != null) {
             if (tagDTO.getTagName() != null) {
-                return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.saveTag(id, TAG_MAPPER.toEntity(tagDTO))), HttpStatus.OK);
+                return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.updateTag(id, TAG_MAPPER.toEntity(tagDTO))), HttpStatus.OK);
             } else {
                 throw new InvalidRequestException("Tag");
             }

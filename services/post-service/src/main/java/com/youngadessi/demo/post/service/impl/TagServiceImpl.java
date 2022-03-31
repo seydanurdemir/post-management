@@ -29,32 +29,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Page<Tag> getAllTags(Long post_id, Pageable pageable) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
-        List<Tag> allTags = post_.getPostTags();
-
-        final int start = (int)pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), allTags.size());
-        final Page<Tag> tagPage2 = new PageImpl<>(allTags.subList(start, end), pageable, allTags.size());
-        //Page<Tag> tagPage = new PageImpl<>(allTags, pageable, allTags.size());
-
-        return tagPage2;
-    }
-
-    @Override
     public Tag getTag(Long id) {
         return tagRepository.findById(id).orElseThrow(() -> new NotFoundException("Tag"));
     }
 
     @Override
     public Tag saveTag(Tag tag) {
-        tagRepository.save(tag);
-
-        return tag;
-    }
-
-    @Override
-    public Tag saveTag(Long post_id, Tag tag) {
         tagRepository.save(tag);
 
         return tag;
@@ -70,17 +50,53 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag updateTag(Long post_id, Long id, Tag tag) {
-        Tag tag_ = tagRepository.findById(id).orElse(null);
+    public void deleteTag(Long id) {
+        tagRepository.delete(getTag(id));
+    }
 
-        tag_.setTagName(tag.getTagName());
+    /* Post Related */
 
-        return tagRepository.save(tag_);
+    @Override
+    public Page<Tag> getAllTags(Long post_id, Pageable pageable) {
+        Post post_ = postRepository.findById(post_id).orElse(null);
+        List<Tag> allTags = post_.getPostTags();
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), allTags.size());
+        final Page<Tag> tagPage2 = new PageImpl<>(allTags.subList(start, end), pageable, allTags.size());
+        //Page<Tag> tagPage = new PageImpl<>(allTags, pageable, allTags.size());
+
+        return tagPage2;
     }
 
     @Override
-    public void deleteTag(Long id) {
-        tagRepository.delete(getTag(id));
+    public Tag saveTag(Long post_id, Long tag_id) {
+        Post post_ = postRepository.findById(post_id).orElse(null);
+        Tag tag_ = tagRepository.findById(tag_id).orElse(null);
+
+        List<Tag> postTags = post_.getPostTags();
+
+        postTags.add(tag_);
+        post_.setPostTags(postTags);
+        postRepository.save(post_);
+
+        return tag_;
+    }
+
+    @Override
+    public List<Tag> saveTag(Long post_id, List<Long> tag_ids) {
+        Post post_ = postRepository.findById(post_id).orElse(null);
+        List<Tag> postTags = post_.getPostTags();
+
+        for (Long tag_id : tag_ids) {
+            Tag tag_ = tagRepository.findById(tag_id).orElse(null);
+            postTags.add(tag_);
+        }
+
+        post_.setPostTags(postTags);
+        postRepository.save(post_);
+
+        return postTags;
     }
 
 }

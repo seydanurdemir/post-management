@@ -4,6 +4,7 @@ import com.youngadessi.demo.post.exception.InvalidRequestException;
 import com.youngadessi.demo.post.exception.NotFoundException;
 import com.youngadessi.demo.post.model.dto.CommentDTO;
 import com.youngadessi.demo.post.model.dto.PostDTO;
+import com.youngadessi.demo.post.model.dto.TagDTO;
 import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Post;
 import com.youngadessi.demo.post.model.entity.Tag;
@@ -154,7 +155,7 @@ public class PostController {
         ResponseEntity<CommentDTO> response;
 
         if (postService.getPost(post_id) != null && commentService.getComment(id) != null) {
-            response = new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.updateComment(post_id, id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
+            response = new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.updateComment(id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
         } else {
             response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -188,6 +189,32 @@ public class PostController {
 
         if (allTags != null && !allTags.isEmpty()) {
             response = new ResponseEntity<>(allTags, HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return response;
+    }
+
+    @PostMapping(value = "/{post_id}/tag/{tag_id}")
+    public ResponseEntity<Tag> saveTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "tag_id") @Min(1) Long tag_id) {
+        ResponseEntity<Tag> response;
+
+        if (postService.getPost(post_id) != null && tagService.getTag(tag_id) != null) {
+            response = new ResponseEntity<>(tagService.saveTag(post_id, tag_id), HttpStatus.OK);
+        } else {
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return response;
+    }
+
+    @PostMapping(value = "/{post_id}/tag")
+    public ResponseEntity<List<Tag>> saveTag(@PathVariable(value = "post_id") @Min(1) Long post_id, List<Long> tag_ids) {
+        ResponseEntity<List<Tag>> response;
+
+        if (postService.getPost(post_id) != null && tag_ids.size() != 0) {
+            response = new ResponseEntity<>(tagService.saveTag(post_id, tag_ids), HttpStatus.OK);
         } else {
             response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

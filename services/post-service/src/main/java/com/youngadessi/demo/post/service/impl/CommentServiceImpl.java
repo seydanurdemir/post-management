@@ -25,6 +25,41 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
+    public Page<Comment> getAllComments(Pageable pageable) {
+        Page<Comment> allComments = commentRepository.findAll(pageable);
+
+        return allComments;
+    }
+
+    @Override
+    public Comment getComment(Long id) {
+        return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment"));
+    }
+
+    @Override
+    public Comment saveComment(Comment comment) {
+        commentRepository.save(comment);
+
+        return comment;
+    }
+
+    @Override
+    public Comment updateComment(Long id, Comment comment) {
+        Comment comment_ = commentRepository.findById(id).orElse(null);
+
+        comment_.setCommentText(comment.getCommentText());
+
+        return commentRepository.save(comment_);
+    }
+
+    @Override
+    public void deleteComment(Long id) {
+        commentRepository.delete(getComment(id));
+    }
+
+    /* Post Related */
+
+    @Override
     public Page<Comment> getAllComments(Long post_id, Pageable pageable) {
         Post post_ = postRepository.findById(post_id).orElse(null);
         List<Comment> allComments = post_.getPostComments();
@@ -52,11 +87,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment getComment(Long id) {
-        return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment"));
-    }
-
-    @Override
     public Comment saveComment(Long post_id, Comment comment) {
         Post post_ = postRepository.findById(post_id).orElse(null);
 
@@ -64,22 +94,6 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);
 
         return comment;
-    }
-
-    @Override
-    public Comment updateComment(Long post_id, Long id, Comment comment) {
-        //Post post_ = postRepository.findById(post_id).orElse(null);
-        Comment comment_ = commentRepository.findById(id).orElse(null);
-
-        //comment_.setPost(post_);
-        comment_.setCommentText(comment.getCommentText());
-
-        return commentRepository.save(comment_);
-    }
-
-    @Override
-    public void deleteComment(Long id) {
-        commentRepository.delete(getComment(id));
     }
 
 }
