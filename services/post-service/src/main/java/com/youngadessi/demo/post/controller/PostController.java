@@ -25,6 +25,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.PagesPerMinute;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -52,23 +54,26 @@ public class PostController {
     /* ------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping
-    public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(page = 0, size = 3) @SortDefault.SortDefaults({ @SortDefault(sort = "content", direction = Sort.Direction.ASC), @SortDefault(sort = "id", direction = Sort.Direction.ASC) }) Pageable pageable) {
+    public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(page = 0, size = 3) @SortDefault.SortDefaults({@SortDefault(sort = "content", direction = Sort.Direction.ASC), @SortDefault(sort = "id", direction = Sort.Direction.ASC)}) Pageable pageable) {
         Page<Post> allPosts = postService.getAllPosts(pageable);
+        return new ResponseEntity<>(allPosts, HttpStatus.OK);
 
-        if (allPosts != null && !allPosts.isEmpty()) {
-            return new ResponseEntity<>(allPosts, HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Posts");
-        }
+//        if (allPosts != null && !allPosts.isEmpty()) {
+//
+//        } else {
+//            throw new NotFoundException("Posts");
+//        }
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostDTO> getPost(@PathVariable(value = "id") @Min(1) Long id) {
-        if (id != null && postService.getPost(id) != null) {
-            return new ResponseEntity<>(POST_MAPPER.toDto(postService.getPost(id)), HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Post");
-        }
+        return new ResponseEntity<>(POST_MAPPER.toDto(postService.getPost(id)), HttpStatus.OK);
+
+//        if (id != null && postService.getPost(id) != null) {
+//            return new ResponseEntity<>(POST_MAPPER.toDto(postService.getPost(id)), HttpStatus.OK);
+//        } else {
+//            throw new NotFoundException("Post");
+//        }
     }
 
     @PostMapping
@@ -108,7 +113,7 @@ public class PostController {
     /* ------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping(value = "/{post_id}/comment")
-    public ResponseEntity<Page<Comment>> getAllComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+    public ResponseEntity<Page<Comment>> getAllComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3) Pageable pageable) {
         ResponseEntity<Page<Comment>> response;
 
         Page<Comment> allComments = commentService.getAllComments(post_id, pageable);
@@ -123,7 +128,7 @@ public class PostController {
     }
 
     @GetMapping(value = "/{post_id}/comment/search")
-    public ResponseEntity<Page<Comment>> searchComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestParam String keyword, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+    public ResponseEntity<Page<Comment>> searchComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestParam String keyword, @PageableDefault(page = 0, size = 3) Pageable pageable) {
         ResponseEntity<Page<Comment>> response;
 
         Page<Comment> searchedComments = commentService.searchComments(post_id, keyword, pageable);
@@ -182,7 +187,7 @@ public class PostController {
     /* ------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping(value = "/{post_id}/tag")
-    public ResponseEntity<Page<Tag>> getAllTags(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+    public ResponseEntity<Page<Tag>> getAllTags(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3) Pageable pageable) {
         ResponseEntity<Page<Tag>> response;
 
         Page<Tag> allTags = tagService.getAllTags(post_id, pageable);
