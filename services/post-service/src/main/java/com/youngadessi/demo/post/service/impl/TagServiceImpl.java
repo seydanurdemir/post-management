@@ -73,10 +73,10 @@ public class TagServiceImpl implements TagService {
         Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
         List<Tag> allTags = post_.getPostTags();
 
+        //Page<Tag> tagPage = new PageImpl<>(allTags, pageable, allTags.size());
         final int start = (int)pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), allTags.size());
         final Page<Tag> tagPage2 = new PageImpl<>(allTags.subList(start, end), pageable, allTags.size());
-        //Page<Tag> tagPage = new PageImpl<>(allTags, pageable, allTags.size());
 
         return tagPage2;
     }

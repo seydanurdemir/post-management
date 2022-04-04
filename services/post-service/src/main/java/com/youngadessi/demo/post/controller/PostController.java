@@ -125,13 +125,13 @@ public class PostController {
     }
 
     @DeleteMapping(value = "/{post_id}/tag/{tag_id}")
-    public ResponseEntity<Tag> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "tag_id") @Min(1) Long tag_id) {
+    public ResponseEntity<Void> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "tag_id") @Min(1) Long tag_id) {
         tagService.deleteTag(post_id, tag_id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{post_id}/tag")
-    public ResponseEntity<List<Tag>> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestBody List<Long> tag_ids) {
+    public ResponseEntity<Void> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestBody List<Long> tag_ids) {
         tagService.deleteTag(post_id, tag_ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }
