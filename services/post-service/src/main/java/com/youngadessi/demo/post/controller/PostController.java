@@ -1,7 +1,5 @@
 package com.youngadessi.demo.post.controller;
 
-import com.youngadessi.demo.post.exception.InvalidRequestException;
-import com.youngadessi.demo.post.exception.NotFoundException;
 import com.youngadessi.demo.post.model.dto.CommentDTO;
 import com.youngadessi.demo.post.model.dto.PostDTO;
 import com.youngadessi.demo.post.model.dto.TagDTO;
@@ -25,8 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.print.attribute.standard.PagesPerMinute;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -34,7 +30,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -49,181 +45,95 @@ public class PostController {
 
     private static final TagMapper TAG_MAPPER = Mappers.getMapper(TagMapper.class);
 
-    /* ------------------------------------------------------------------------------------------------------------- */
-    /* ------------------------------------------------    POST     ------------------------------------------------ */
-    /* ------------------------------------------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------------     POST     ------------------------------------------------ */
+    /* -------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping
-    public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(page = 0, size = 3) @SortDefault.SortDefaults({@SortDefault(sort = "content", direction = Sort.Direction.ASC), @SortDefault(sort = "id", direction = Sort.Direction.ASC)}) Pageable pageable) {
-        Page<Post> allPosts = postService.getAllPosts(pageable);
-        return new ResponseEntity<>(allPosts, HttpStatus.OK);
-
-//        if (allPosts != null && !allPosts.isEmpty()) {
-//
-//        } else {
-//            throw new NotFoundException("Posts");
-//        }
+    public ResponseEntity<Page<Post>> getAllPosts(@PageableDefault(page = 0, size = 3) @SortDefault.SortDefaults({ @SortDefault(sort = "content", direction = Sort.Direction.ASC), @SortDefault(sort = "id", direction = Sort.Direction.ASC) }) Pageable pageable) {
+        return new ResponseEntity<>(postService.getAllPosts(pageable), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostDTO> getPost(@PathVariable(value = "id") @Min(1) Long id) {
         return new ResponseEntity<>(POST_MAPPER.toDto(postService.getPost(id)), HttpStatus.OK);
-
-//        if (id != null && postService.getPost(id) != null) {
-//            return new ResponseEntity<>(POST_MAPPER.toDto(postService.getPost(id)), HttpStatus.OK);
-//        } else {
-//            throw new NotFoundException("Post");
-//        }
     }
 
     @PostMapping
     public ResponseEntity<PostDTO> savePost(@Valid @RequestBody PostDTO postDTO) {
-        if (postDTO != null && postDTO.getContent() != null) {
-            return new ResponseEntity<>(POST_MAPPER.toDto(postService.savePost(POST_MAPPER.toEntity(postDTO))), HttpStatus.CREATED);
-        } else {
-            throw new InvalidRequestException("Post");
-        }
+        return new ResponseEntity<>(POST_MAPPER.toDto(postService.savePost(POST_MAPPER.toEntity(postDTO))), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable(value = "id") @Min(1) Long id, @Valid @RequestBody PostDTO postDTO) {
-        if (id != null && postService.getPost(id) != null) {
-            if (postDTO.getContent() != null) {
-                return new ResponseEntity<>(POST_MAPPER.toDto(postService.updatePost(id, POST_MAPPER.toEntity(postDTO))), HttpStatus.OK);
-            } else {
-                throw new InvalidRequestException("Post");
-            }
-        } else {
-            throw new NotFoundException("Post");
-        }
+        return new ResponseEntity<>(POST_MAPPER.toDto(postService.updatePost(id, POST_MAPPER.toEntity(postDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable(value = "id") @Min(1) Long id) {
-        if (id != null && postService.getPost(id) != null) {
-            postService.deletePost(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Post");
-        }
+        postService.deletePost(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /* ------------------------------------------------------------------------------------------------------------- */
-    /* ------------------------------------------------   COMMENT   ------------------------------------------------ */
-    /* ------------------------------------------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------------    COMMENT   ------------------------------------------------ */
+    /* -------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping(value = "/{post_id}/comment")
-    public ResponseEntity<Page<Comment>> getAllComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3) Pageable pageable) {
-        ResponseEntity<Page<Comment>> response;
-
-        Page<Comment> allComments = commentService.getAllComments(post_id, pageable);
-
-        if (allComments != null && !allComments.isEmpty()) {
-            response = new ResponseEntity<>(allComments, HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+    public ResponseEntity<Page<Comment>> getAllComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+        return new ResponseEntity<>(commentService.getAllComments(post_id, pageable), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{post_id}/comment/search")
-    public ResponseEntity<Page<Comment>> searchComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestParam String keyword, @PageableDefault(page = 0, size = 3) Pageable pageable) {
-        ResponseEntity<Page<Comment>> response;
-
-        Page<Comment> searchedComments = commentService.searchComments(post_id, keyword, pageable);
-
-        if (searchedComments != null && !searchedComments.isEmpty()) {
-            response = new ResponseEntity<>(searchedComments, HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+    public ResponseEntity<Page<Comment>> searchComments(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestParam String keyword, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+        return new ResponseEntity<>(commentService.searchComments(post_id, keyword, pageable), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{post_id}/comment")
     public ResponseEntity<CommentDTO> saveComment(@PathVariable(value = "post_id") @Min(1) Long post_id, @Valid @RequestBody CommentDTO commentDTO) {
-        ResponseEntity<CommentDTO> response;
-
-        if (postService.getPost(post_id) != null) {
-            response = new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.saveComment(post_id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+        return new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.saveComment(post_id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{post_id}/comment/{id}")
     public ResponseEntity<CommentDTO> updateComment(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "id") @Min(1) Long id, @Valid @RequestBody CommentDTO commentDTO) {
-        ResponseEntity<CommentDTO> response;
-
-        if (postService.getPost(post_id) != null && commentService.getComment(id) != null) {
-            response = new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.updateComment(id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+        return new ResponseEntity<>(COMMENT_MAPPER.toDto(commentService.updateComment(id, COMMENT_MAPPER.toEntity(commentDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{post_id}/comment/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "id") @Min(1) Long id) {
-        ResponseEntity<Void> response;
-
-        if (postService.getPost(id) != null && commentService.getComment(id) != null) {
-            commentService.deleteComment(id);
-            response = new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+        commentService.deleteComment(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /* ------------------------------------------------------------------------------------------------------------- */
-    /* ------------------------------------------------     TAG     ------------------------------------------------ */
-    /* ------------------------------------------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------------      TAG     ------------------------------------------------ */
+    /* -------------------------------------------------------------------------------------------------------------- */
 
     @GetMapping(value = "/{post_id}/tag")
-    public ResponseEntity<Page<Tag>> getAllTags(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3) Pageable pageable) {
-        ResponseEntity<Page<Tag>> response;
-
-        Page<Tag> allTags = tagService.getAllTags(post_id, pageable);
-
-        if (allTags != null && !allTags.isEmpty()) {
-            response = new ResponseEntity<>(allTags, HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+    public ResponseEntity<Page<Tag>> getAllTags(@PathVariable(value = "post_id") @Min(1) Long post_id, @PageableDefault(page = 0, size = 3)  Pageable pageable) {
+        return new ResponseEntity<>(tagService.getAllTags(post_id, pageable), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{post_id}/tag/{tag_id}")
     public ResponseEntity<Tag> saveTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "tag_id") @Min(1) Long tag_id) {
-        ResponseEntity<Tag> response;
-
-        if (postService.getPost(post_id) != null && tagService.getTag(tag_id) != null) {
-            response = new ResponseEntity<>(tagService.saveTag(post_id, tag_id), HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+        return new ResponseEntity<>(tagService.saveTag(post_id, tag_id), HttpStatus.OK);
     }
 
     @PostMapping(value = "/{post_id}/tag")
-    public ResponseEntity<List<Tag>> saveTag(@PathVariable(value = "post_id") @Min(1) Long post_id, List<Long> tag_ids) {
-        ResponseEntity<List<Tag>> response;
-
-        if (postService.getPost(post_id) != null && tag_ids.size() != 0) {
-            response = new ResponseEntity<>(tagService.saveTag(post_id, tag_ids), HttpStatus.OK);
-        } else {
-            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return response;
+    public ResponseEntity<List<Tag>> saveTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestBody List<Long> tag_ids) {
+        return new ResponseEntity<>(tagService.saveTag(post_id, tag_ids), HttpStatus.OK);
     }
+
+    @DeleteMapping(value = "/{post_id}/tag/{tag_id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @PathVariable(value = "tag_id") @Min(1) Long tag_id) {
+        tagService.deleteTag(post_id, tag_id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{post_id}/tag")
+    public ResponseEntity<Void> deleteTag(@PathVariable(value = "post_id") @Min(1) Long post_id, @RequestBody List<Long> tag_ids) {
+        tagService.deleteTag(post_id, tag_ids);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

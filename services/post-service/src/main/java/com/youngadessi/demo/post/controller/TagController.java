@@ -1,7 +1,5 @@
 package com.youngadessi.demo.post.controller;
 
-import com.youngadessi.demo.post.exception.InvalidRequestException;
-import com.youngadessi.demo.post.exception.NotFoundException;
 import com.youngadessi.demo.post.model.dto.TagDTO;
 import com.youngadessi.demo.post.model.entity.Tag;
 import com.youngadessi.demo.post.model.mapper.TagMapper;
@@ -23,7 +21,7 @@ import javax.validation.constraints.Min;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tag")
+@RequestMapping("/tags")
 public class TagController {
 
     private final TagService tagService;
@@ -32,54 +30,28 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<Page<Tag>> getAllTags(@PageableDefault(page = 0, size = 3) @SortDefault.SortDefaults({ @SortDefault(sort = "tagName", direction = Sort.Direction.ASC), @SortDefault(sort = "id", direction = Sort.Direction.ASC) }) Pageable pageable) {
-        Page<Tag> allTags = tagService.getAllTags(pageable);
-
-        if (allTags != null && !allTags.isEmpty()) {
-            return new ResponseEntity<>(allTags, HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Tag");
-        }
+        return new ResponseEntity<>(tagService.getAllTags(pageable), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<TagDTO> getTag(@PathVariable(value = "id") @Min(1) Long id) {
-        if (id != null && tagService.getTag(id) != null) {
-            return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.getTag(id)), HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Tag");
-        }
+        return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.getTag(id)), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<TagDTO> saveTag(@Valid @RequestBody TagDTO tagDTO) {
-        if (tagDTO != null && tagDTO.getTagName() != null) {
-            return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.saveTag(TAG_MAPPER.toEntity(tagDTO))), HttpStatus.CREATED);
-        } else {
-            throw new InvalidRequestException("Tag");
-        }
+        return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.saveTag(TAG_MAPPER.toEntity(tagDTO))), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<TagDTO> updateTag(@PathVariable(value = "id") @Min(1) Long id, @Valid @RequestBody TagDTO tagDTO) {
-        if (id != null && tagService.getTag(id) != null) {
-            if (tagDTO.getTagName() != null) {
-                return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.updateTag(id, TAG_MAPPER.toEntity(tagDTO))), HttpStatus.OK);
-            } else {
-                throw new InvalidRequestException("Tag");
-            }
-        } else {
-            throw new NotFoundException("Tag");
-        }
+        return new ResponseEntity<>(TAG_MAPPER.toDto(tagService.updateTag(id, TAG_MAPPER.toEntity(tagDTO))), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteTag(@PathVariable(value = "id") @Min(1) Long id) {
-        if (id != null && tagService.getTag(id) != null) {
-            tagService.deleteTag(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            throw new NotFoundException("Tag");
-        }
+        tagService.deleteTag(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

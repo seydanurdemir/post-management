@@ -1,5 +1,6 @@
 package com.youngadessi.demo.post.service.impl;
 
+import com.youngadessi.demo.post.exception.InvalidRequestException;
 import com.youngadessi.demo.post.exception.NotFoundException;
 import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Post;
@@ -10,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,30 +25,38 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<Comment> getAllComments(Pageable pageable) {
-        Page<Comment> allComments = commentRepository.findAll(pageable);
-
-        return allComments;
+        return commentRepository.findAll(pageable);
     }
 
     @Override
     public Comment getComment(Long id) {
-        return commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment"));
+        return commentRepository.findById(id).orElse(null);
     }
 
     @Override
     public Comment saveComment(Comment comment) {
-        commentRepository.save(comment);
+        if (comment.getCommentText() != null) {
+            commentRepository.save(comment);
 
-        return comment;
+            return comment;
+        } else {
+            throw new InvalidRequestException("Comment");
+        }
     }
 
     @Override
     public Comment updateComment(Long id, Comment comment) {
-        Comment comment_ = commentRepository.findById(id).orElse(null);
+        Comment comment_ = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Comment"));
 
-        comment_.setCommentText(comment.getCommentText());
+        if (comment.getCommentText() != null) {
+            comment_.setCommentText(comment.getCommentText());
 
-        return commentRepository.save(comment_);
+            commentRepository.save(comment_);
+
+            return comment;
+        } else {
+            throw new InvalidRequestException("Comment");
+        }
     }
 
     @Override
@@ -57,43 +64,50 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.delete(getComment(id));
     }
 
-    /* Post Related */
+    /* -------------------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------------ POST-COMMENT ------------------------------------------------ */
+    /* -------------------------------------------------------------------------------------------------------------- */
 
     @Override
     public Page<Comment> getAllComments(Long post_id, Pageable pageable) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
         List<Comment> allComments = post_.getPostComments();
 
+        //Page<Comment> commentPage = new PageImpl<>(allComments, pageable, allComments.size());
         final int start = (int)pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), allComments.size());
         final Page<Comment> commentPage2 = new PageImpl<>(allComments.subList(start, end), pageable, allComments.size());
-        //Page<Comment> commentPage = new PageImpl<>(allComments, pageable, allComments.size());
 
         return commentPage2;
     }
 
     @Override
     public Page<Comment> searchComments(Long post_id, String keyword, Pageable pageable) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
         List<Comment> allComments = post_.getPostComments();
         List<Comment> searchedComments = allComments.stream().filter(comm -> comm.getCommentText().contains(keyword)).collect(Collectors.toList());
 
+        //Page<Comment> commentPage = new PageImpl<>(commentList, pageable, commentList.size());
         final int start = (int)pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), searchedComments.size());
         final Page<Comment> commentPage2 = new PageImpl<>(searchedComments.subList(start, end), pageable, searchedComments.size());
-        //Page<Comment> commentPage = new PageImpl<>(commentList, pageable, commentList.size());
 
         return commentPage2;
     }
 
     @Override
     public Comment saveComment(Long post_id, Comment comment) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
 
-        comment.setPost(post_);
-        commentRepository.save(comment);
+        if (comment.getCommentText() != null) {
+            comment.setPost(post_);
 
-        return comment;
+            commentRepository.save(comment);
+
+            return comment;
+        } else {
+            throw new InvalidRequestException("Comment");
+        }
     }
 
 }

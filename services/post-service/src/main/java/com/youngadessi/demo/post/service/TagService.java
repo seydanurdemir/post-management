@@ -26,4 +26,8 @@ public interface TagService {
 
     List<Tag> saveTag(Long post_id, List<Long> tag_ids);
 
+    void deleteTag(Long post_id, Long tag_id);
+
+    void deleteTag(Long post_id, List<Long> tag_ids);
+
 }

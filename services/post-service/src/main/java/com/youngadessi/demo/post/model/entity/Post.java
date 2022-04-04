@@ -18,6 +18,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @NoArgsConstructor
@@ -32,6 +33,7 @@ public class Post extends BaseEntity {
     @Column(name = "created_by_name")
     private String createdByName;
 
+    @NotBlank
     @Column(name = "content")
     private String content;
 

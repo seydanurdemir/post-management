@@ -1,5 +1,6 @@
 package com.youngadessi.demo.post.service.impl;
 
+import com.youngadessi.demo.post.exception.InvalidRequestException;
 import com.youngadessi.demo.post.exception.NotFoundException;
 import com.youngadessi.demo.post.model.entity.Post;
 import com.youngadessi.demo.post.repository.PostRepository;
@@ -22,29 +23,39 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post getPost(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post"));
+        return postRepository.findById(id).orElse(null);
     }
 
     @Override
     public Post savePost(Post post) {
-        postRepository.save(post);
+        if (post.getCreatedByName() != null && post.getContent() != null) {
+            postRepository.save(post);
 
-        return post;
+            return post;
+        } else {
+            throw new InvalidRequestException("Post");
+        }
     }
 
     @Override
     public Post updatePost(Long id, Post post) {
-        Post post_ = postRepository.findById(id).orElse(null);
+        Post post_ = postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post"));
 
-        post_.setCreatedByName(post.getCreatedByName());
-        post_.setContent(post.getContent());
+        if (post.getCreatedByName() != null && post.getContent() != null) {
+            post_.setCreatedByName(post.getCreatedByName());
+            post_.setContent(post.getContent());
 
-        return postRepository.save(post_);
+            postRepository.save(post_);
+
+            return post;
+        } else {
+            throw new InvalidRequestException("Post");
+        }
     }
 
     @Override
     public void deletePost(Long id) {
-        postRepository.delete(getPost(id));
+        postRepository.delete(postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post")));
     }
 
 }
