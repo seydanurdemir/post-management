@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class Comment extends BaseEntity {
     @Column(name = "created_by_name")
     private String createdByName;
 
+    @NotBlank
     @Column(name = "comment_text")
     private String commentText;
 

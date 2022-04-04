@@ -112,6 +112,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public void deleteTag(Long post_id, Long tag_id) {
         Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
+        tagRepository.findById(tag_id).orElseThrow(() -> new NotFoundException("Tag"));
         List<Tag> postTags_ = post_.getPostTags();
 
         postTags_.removeIf(x -> (x.getId() == tag_id));
