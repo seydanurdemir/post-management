@@ -1,7 +1,7 @@
 package com.youngadessi.demo.post.service.impl;
 
+import com.youngadessi.demo.post.exception.InvalidRequestException;
 import com.youngadessi.demo.post.exception.NotFoundException;
-import com.youngadessi.demo.post.model.entity.Comment;
 import com.youngadessi.demo.post.model.entity.Post;
 import com.youngadessi.demo.post.model.entity.Tag;
 import com.youngadessi.demo.post.repository.PostRepository;
@@ -12,8 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,35 +30,47 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag getTag(Long id) {
-        return tagRepository.findById(id).orElseThrow(() -> new NotFoundException("Tag"));
+        return tagRepository.findById(id).orElse(null);
     }
 
     @Override
     public Tag saveTag(Tag tag) {
-        tagRepository.save(tag);
+        if (tag.getTagName() != null) {
+            tagRepository.save(tag);
 
-        return tag;
+            return tag;
+        } else {
+            throw new InvalidRequestException("Tag");
+        }
     }
 
     @Override
     public Tag updateTag(Long id, Tag tag) {
-        Tag tag_ = tagRepository.findById(id).orElse(null);
+        Tag tag_ = tagRepository.findById(id).orElseThrow(() -> new NotFoundException("Tag"));
 
-        tag_.setTagName(tag.getTagName());
+        if (tag.getTagName() != null) {
+            tag_.setTagName(tag.getTagName());
 
-        return tagRepository.save(tag_);
+            tagRepository.save(tag_);
+
+            return tag;
+        } else {
+            throw new InvalidRequestException("Tag");
+        }
     }
 
     @Override
     public void deleteTag(Long id) {
-        tagRepository.delete(getTag(id));
+        tagRepository.delete(tagRepository.findById(id).orElseThrow(() -> new NotFoundException("Tag")));
     }
 
-    /* Post Related */
+    /* -------------------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------------   POST-TAG   ------------------------------------------------ */
+    /* -------------------------------------------------------------------------------------------------------------- */
 
     @Override
     public Page<Tag> getAllTags(Long post_id, Pageable pageable) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
         List<Tag> allTags = post_.getPostTags();
 
         final int start = (int)pageable.getOffset();
@@ -71,13 +83,13 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public Tag saveTag(Long post_id, Long tag_id) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
-        Tag tag_ = tagRepository.findById(tag_id).orElse(null);
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
+        Tag tag_ = tagRepository.findById(tag_id).orElseThrow(() -> new NotFoundException("Tag"));
+        List<Tag> postTags_ = post_.getPostTags();
 
-        List<Tag> postTags = post_.getPostTags();
+        postTags_.add(tag_);
 
-        postTags.add(tag_);
-        post_.setPostTags(postTags);
+        post_.setPostTags(postTags_);
         postRepository.save(post_);
 
         return tag_;
@@ -85,18 +97,38 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public List<Tag> saveTag(Long post_id, List<Long> tag_ids) {
-        Post post_ = postRepository.findById(post_id).orElse(null);
-        List<Tag> postTags = post_.getPostTags();
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
+        List<Tag> postTags_ = post_.getPostTags();
+        List<Tag> tags = tag_ids.stream().map(x -> tagRepository.findById(x).orElse(null)).collect(Collectors.toList());
 
-        for (Long tag_id : tag_ids) {
-            Tag tag_ = tagRepository.findById(tag_id).orElse(null);
-            postTags.add(tag_);
-        }
+        postTags_.addAll(tags);
 
-        post_.setPostTags(postTags);
+        post_.setPostTags(postTags_.stream().distinct().collect(Collectors.toList()));
         postRepository.save(post_);
 
-        return postTags;
+        return tags;
+    }
+
+    @Override
+    public void deleteTag(Long post_id, Long tag_id) {
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
+        List<Tag> postTags_ = post_.getPostTags();
+
+        postTags_.removeIf(x -> (x.getId() == tag_id));
+
+        post_.setPostTags(postTags_);
+        postRepository.save(post_);
+    }
+
+    @Override
+    public void deleteTag(Long post_id, List<Long> tag_ids) {
+        Post post_ = postRepository.findById(post_id).orElseThrow(() -> new NotFoundException("Post"));
+        List<Tag> postTags_ = post_.getPostTags();
+
+        tag_ids.forEach(x -> postTags_.removeIf(y -> (y.getId() == x)));
+
+        post_.setPostTags(postTags_);
+        postRepository.save(post_);
     }
 
 }

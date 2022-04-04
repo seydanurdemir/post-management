@@ -30,6 +30,9 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column(name = "created_by_name")
+    private String createdByName;
+
     @Column(name = "comment_text")
     private String commentText;
 
