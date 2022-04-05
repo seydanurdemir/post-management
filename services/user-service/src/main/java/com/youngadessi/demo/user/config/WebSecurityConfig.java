@@ -1,5 +1,5 @@
 package com.youngadessi.demo.user.config;
-/*
+
 import com.youngadessi.demo.user.security.JwtTokenFilterConfigurer;
 import com.youngadessi.demo.user.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +40,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
     }
 
-    *//*@Override
+    /*@Override
     public void configure(WebSecurity web) {
         web.ignoring()
                 .antMatchers("public");
-    }*//*
+    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -57,4 +57,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-}*/
+}

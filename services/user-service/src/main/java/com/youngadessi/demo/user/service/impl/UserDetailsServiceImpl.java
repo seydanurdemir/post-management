@@ -1,5 +1,5 @@
-package com.youngadessi.demo.user.security;
-/*
+package com.youngadessi.demo.user.service.impl;
+
 import com.youngadessi.demo.user.model.entity.User;
 import com.youngadessi.demo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +8,26 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    @PostConstruct
+    private void postConstruct() {
+        // Sample test user
+        User testUser = new User();
+        testUser.setUsername("test");
+        testUser.setPassword("1234");
+        userRepository.save(testUser);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        //User user = userRepository.findByUsername(username).orElseThrow(() -> throw new UsernameNotFoundException("User '" + username + "' not found!"));
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
@@ -34,4 +46,3 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
 }
-*/
