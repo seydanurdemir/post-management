@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /auth-service
+
+spring:
+  profiles:
+    include: sql #, script
+  jpa:
+    properties:
+      hibernate.default_schema: auth_schema
+
+# security
+security:
+  jwt:
+    token:
+      secret-key: secret-key
+      expire-length: 30000000
