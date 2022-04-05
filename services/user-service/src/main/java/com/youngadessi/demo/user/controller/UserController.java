@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
@@ -53,29 +52,6 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable(value = "id") @Min(1) Long id) {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    /* Security Related */
-
-    @PostMapping("/signin")
-    public String signin(@Valid @RequestBody UserDTO userDTO) {
-        return userService.signin(userDTO.getUsername(), userDTO.getPassword());
-    }
-
-    @PostMapping("/signup")
-    public String signup(@RequestBody @Valid UserDTO userDTO) {
-        return userService.signup(USER_MAPPER.toEntity(userDTO));
-    }
-
-    @DeleteMapping(value = "/{username}")
-    public String delete(@PathVariable String username) {
-        userService.delete(username);
-        return username;
-    }
-
-    @GetMapping(value = "/me")
-    public UserDTO whoami(HttpServletRequest req) {
-        return USER_MAPPER.toDto(userService.whoami(req));
     }
 
 }
