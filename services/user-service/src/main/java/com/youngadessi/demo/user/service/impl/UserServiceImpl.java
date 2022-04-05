@@ -1,13 +1,14 @@
 package com.youngadessi.demo.user.service.impl;
 
+import com.youngadessi.demo.user.exception.InvalidRequestException;
+import com.youngadessi.demo.user.exception.NotFoundException;
 import com.youngadessi.demo.user.model.entity.User;
 import com.youngadessi.demo.user.repository.UserRepository;
 import com.youngadessi.demo.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,29 +17,44 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
     public User getUser(Long id) {
-        Optional<User> byId = userRepository.findById(id);
-        return byId.orElseThrow(() -> new RuntimeException("User not found!"));
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
-    public void addUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        if (user.getUsername() != null && user.getPassword() != null) {
+            userRepository.save(user);
+
+            return user;
+        } else {
+            throw new InvalidRequestException("User");
+        }
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    public User updateUser(Long id, User user) {
+        User user_ = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User"));
+
+        if (user.getUsername() != null && user.getPassword() != null) {
+            user_.setUsername(user.getUsername());
+            user_.setPassword(user.getPassword());
+
+            userRepository.save(user_);
+
+            return user;
+        } else {
+            throw new InvalidRequestException("User");
+        }
     }
 
     @Override
-    public boolean deleteUser(Long id) {
-        userRepository.delete(getUser(id));
-        return true;
+    public void deleteUser(Long id) {
+        userRepository.delete(userRepository.findById(id).orElseThrow(() -> new NotFoundException("User")));
     }
 }
