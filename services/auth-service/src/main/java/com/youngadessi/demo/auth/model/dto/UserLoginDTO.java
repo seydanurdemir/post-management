@@ -1,16 +1,14 @@
-package com.youngadessi.demo.user.model.dto;
+package com.youngadessi.demo.auth.model.dto;
 
 import lombok.Getter;
-
-import javax.validation.constraints.NotBlank;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class UserLoginDTO {
 
-    @NotBlank
     private String username;
 
-    @NotBlank
     private String password;
 
 }
